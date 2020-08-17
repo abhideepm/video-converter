@@ -1,4 +1,4 @@
-const { app, dialog, BrowserWindow, Menu, Notification } = require('electron')
+const { app, dialog, BrowserWindow, Menu } = require('electron')
 const ipc = require('electron').ipcMain
 
 const path = require('path')
