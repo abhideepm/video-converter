@@ -1,9 +1,18 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
-import React from 'react'
+import React, { useState } from 'react'
 const electron = window.require('electron')
 const ipc = electron.ipcRenderer
 
 const App = () => {
+	const [processingStatus, setProcessingStatus] = useState(false)
+
+	ipc.on('toggle-status-true', (_, path) => {
+		setProcessingStatus(true)
+		ipc.send('start-processing', path)
+	})
+	ipc.on('toggle-status-false', () => {
+		setProcessingStatus(false)
+	})
 	return (
 		<div className="text-center d-flex flex-column align-items-center mt-5 mx-5">
 			<h1>Welcome to Video Converter</h1>
@@ -27,7 +36,9 @@ const App = () => {
 				Steps to Convert a File
 				<div className="text-muted">
 					<ol className="text-left">
-						<li>Select from New Project from the Menu Option</li>
+						<li>
+							Select from New Project from the Menu Option or the Button Below
+						</li>
 						<li>Select MP4 File to Be Converted</li>
 					</ol>
 				</div>
@@ -42,6 +53,12 @@ const App = () => {
 			>
 				Select
 			</button>
+			{processingStatus ? (
+				<>
+					<div className="spinner-border text-light mt-3"></div>
+					<p>Converting...</p>
+				</>
+			) : null}
 		</div>
 	)
 }

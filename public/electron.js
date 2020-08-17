@@ -1,4 +1,4 @@
-const { app, dialog, BrowserWindow, Menu } = require('electron')
+const { app, dialog, BrowserWindow, Menu, Notification } = require('electron')
 const ipc = require('electron').ipcMain
 
 const path = require('path')
@@ -71,7 +71,11 @@ ipc.on('select-folder', e => {
 			properties: ['openDirectory', 'promptToCreate', 'createDirectory'],
 		})
 		.then(result => {
-			e.sender.send('select-output-folder', result.filePaths[0])
+			if (!result.canceled)
+				e.sender.send('select-output-folder', result.filePaths[0])
+			else {
+				dialog.showErrorBox('Folder not Selected', 'Please select a folder')
+			}
 		})
 })
 
@@ -84,9 +88,21 @@ ipc.on('open-select-file', e => {
 			properties: ['openFile'],
 		})
 		.then(result => {
-			if (result) e.sender.send('selected-file', result.filePaths[0])
+			if (!result.canceled)
+				e.sender.send('toggle-status-true', result.filePaths[0])
+			else {
+				dialog.showErrorBox('File not Selected', 'Please select a file')
+			}
 		})
 		.catch(err => console.log(err))
+})
+
+ipc.on('start-processing', (e, path) => {
+	e.sender.send('selected-file', path)
+})
+
+ipc.on('toggle-status-main', e => {
+	e.sender.send('toggle-status-false')
 })
 
 ipc.on('invalid-output-folder', e => {
