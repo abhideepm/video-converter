@@ -54,7 +54,7 @@ const menu = Menu.buildFromTemplate([
 							],
 						})
 						.then(result => {
-							if (result !== undefined) {
+							if (result) {
 								mainWindow.webContents.send(
 									'select-output-folder',
 									result.filePaths[0]
@@ -80,11 +80,13 @@ ipc.on('open-select-file', e => {
 	if (os.platform() === ('win32' || 'linux')) {
 		dialog
 			.showOpenDialog({
+				title: 'Select File to Convert',
+				buttonLabel: 'Select',
 				filters: [{ name: 'MP4 File', extensions: ['mp4'] }],
 				properties: ['openFile'],
 			})
 			.then(result => {
-				e.sender.send('selected-file', result.filePaths[0])
+				if (result) e.sender.send('selected-file', result.filePaths[0])
 			})
 			.catch(err => console.log(err))
 	}

@@ -30,5 +30,10 @@ ipc.on('select-output-folder', (_, outputPath) => {
 })
 
 ipc.on('selected-file', (_, paths) => {
-	process.exec(`${ffmpegPath} -i ${paths} ${path.join(output, '/output.avi')}`)
+	process.exec(
+		`${ffmpegPath} -i ${paths} -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls ${path.join(
+			output,
+			`/output.m3u8`
+		)}`
+	)
 })
