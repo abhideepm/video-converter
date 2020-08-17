@@ -3,7 +3,6 @@ const ipc = require('electron').ipcMain
 
 const path = require('path')
 const isDev = require('electron-is-dev')
-const os = require('os')
 
 let mainWindow
 
@@ -14,6 +13,7 @@ function createWindow() {
 		webPreferences: {
 			nodeIntegration: true,
 		},
+		show: false,
 	})
 	mainWindow.loadURL(
 		isDev
@@ -22,6 +22,8 @@ function createWindow() {
 	)
 	mainWindow.on('closed', () => (mainWindow = null))
 	mainWindow.webContents.openDevTools()
+	mainWindow.maximize()
+	mainWindow.show()
 }
 
 app.on('ready', createWindow)
@@ -44,25 +46,8 @@ const menu = Menu.buildFromTemplate([
 		submenu: [
 			{
 				label: 'New Project',
-				click() {
-					dialog
-						.showOpenDialog({
-							title: 'Select Empty Output Folder',
-							buttonLabel: 'Select Folder',
-							properties: [
-								'openDirectory',
-								'promptToCreate',
-								'createDirectory',
-							],
-						})
-						.then(result => {
-							if (result) {
-								mainWindow.webContents.send(
-									'select-output-folder',
-									result.filePaths[0]
-								)
-							}
-						})
+				click(_, mainWindow) {
+					mainWindow.webContents.send('open-folder')
 				},
 			},
 			{ type: 'separator' },
@@ -78,33 +63,38 @@ const menu = Menu.buildFromTemplate([
 
 Menu.setApplicationMenu(menu)
 
+ipc.on('select-folder', e => {
+	dialog
+		.showOpenDialog({
+			title: 'Select Empty Output Folder',
+			buttonLabel: 'Select Folder',
+			properties: ['openDirectory', 'promptToCreate', 'createDirectory'],
+		})
+		.then(result => {
+			e.sender.send('select-output-folder', result.filePaths[0])
+		})
+})
+
 ipc.on('open-select-file', e => {
-	if (os.platform() === ('win32' || 'linux')) {
-		dialog
-			.showOpenDialog({
-				title: 'Select File to Convert',
-				buttonLabel: 'Select',
-				filters: [{ name: 'MP4 File', extensions: ['mp4'] }],
-				properties: ['openFile'],
-			})
-			.then(result => {
-				if (result) e.sender.send('selected-file', result.filePaths[0])
-			})
-			.catch(err => console.log(err))
-	}
+	dialog
+		.showOpenDialog({
+			title: 'Select File to Convert',
+			buttonLabel: 'Select',
+			filters: [{ name: 'MP4 File', extensions: ['mp4'] }],
+			properties: ['openFile'],
+		})
+		.then(result => {
+			if (result) e.sender.send('selected-file', result.filePaths[0])
+		})
+		.catch(err => console.log(err))
 })
 
 ipc.on('invalid-output-folder', e => {
-	dialog
-		.showMessageBox({
-			type: 'error',
-			buttons: ['OK'],
-			title: 'Invalid Output Folder',
-			message:
-				'The selected Output Folder is not empty, please select an Empty Folder',
-		})
-		.then(result => {
-			if (result) e.sender.send('open-select-file')
-		})
-		.catch(err => console.log(err))
+	dialog.showMessageBox({
+		type: 'error',
+		buttons: ['OK'],
+		title: 'Invalid Output Folder',
+		message:
+			'The selected Output Folder is not empty, please select an Empty Folder',
+	})
 })

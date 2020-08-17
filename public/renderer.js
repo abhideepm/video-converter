@@ -20,9 +20,15 @@ ffmpeg.setFfprobePath(ffprobePath)
 
 let output
 
+ipc.on('open-folder', () => {
+	ipc.send('select-folder')
+})
+
 ipc.on('select-output-folder', (_, outputPath) => {
-	if (!fs.readdirSync(outputPath).length) output = outputPath
-	else ipc.send('invalid-output-folder')
+	if (!fs.readdirSync(outputPath).length) {
+		output = outputPath
+		ipc.send('open-select-file')
+	} else ipc.send('invalid-output-folder')
 })
 
 ipc.on('selected-file', (_, paths) => {
