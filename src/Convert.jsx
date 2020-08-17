@@ -3,7 +3,7 @@ const electron = window.require('electron')
 const ipc = electron.ipcRenderer
 const path = window.require('path')
 
-const Convert = ({ history }) => {
+const Convert = () => {
 	const [processingStatus, setProcessingStatus] = useState(false)
 	const [outputPath, setOutputPath] = useState('')
 	const [inputPath, setInputPath] = useState('')
@@ -11,7 +11,8 @@ const Convert = ({ history }) => {
 
 	ipc.on('toggle-status-true', (_, filePath, folderPath) => {
 		setOutputPath(folderPath)
-		setInputPath(filePath)
+		setInputPath(filePath.slice(0))
+		// ipc.send('start-processing', inputPath)
 	})
 	ipc.on('toggle-status-false', () => {
 		setProcessingStatus(false)

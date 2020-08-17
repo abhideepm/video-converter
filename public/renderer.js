@@ -50,11 +50,13 @@ ipc.on('render-file', (_, filePath) => {
 
 	const proc = new ffmpeg(inputPath)
 	proc
-		.on('error', function (error) {
+		.on('end', () => {
+			ipc.send('toggle-status-main')
+		})
+		.on('error', error => {
 			console.log(error)
 		})
 		.outputOptions(options)
 		.output(outputPath)
 		.run()
-	ipc.send('toggle-status-main')
 })
