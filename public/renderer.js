@@ -18,13 +18,7 @@ const ffprobePath = require('ffprobe-static').path.replace(
 ffmpeg.setFfmpegPath(ffmpegPath)
 ffmpeg.setFfprobePath(ffprobePath)
 
-const selectFile = document.getElementById('selectFile')
-
 let output
-
-selectFile.addEventListener('click', () => {
-	ipc.send('open-select-file')
-})
 
 ipc.on('select-output-folder', (_, outputPath) => {
 	if (!fs.readdirSync(outputPath).length) output = outputPath
