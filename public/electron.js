@@ -1,4 +1,5 @@
-const { app, dialog, BrowserWindow, ipcMain, Menu } = require('electron')
+const { app, dialog, BrowserWindow, Menu } = require('electron')
+const ipc = require('electron').ipcMain
 
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -41,7 +42,27 @@ const menu = Menu.buildFromTemplate([
 	{
 		label: 'Menu',
 		submenu: [
-			{ label: 'New Project' },
+			{
+				label: 'New Project',
+				click() {
+					dialog
+						.showOpenDialog({
+							properties: [
+								'openDirectory',
+								'promptToCreate',
+								'createDirectory',
+							],
+						})
+						.then(result => {
+							if (result !== undefined) {
+								mainWindow.webContents.send(
+									'select-output-folder',
+									result.filePaths[0]
+								)
+							}
+						})
+				},
+			},
 			{ type: 'separator' },
 			{
 				label: 'Exit',
@@ -55,10 +76,13 @@ const menu = Menu.buildFromTemplate([
 
 Menu.setApplicationMenu(menu)
 
-ipcMain.on('openSelectFile', e => {
+ipc.on('open-select-file', e => {
 	if (os.platform() === ('win32' || 'linux')) {
 		dialog
-			.showOpenDialog({ properties: ['openFile'] })
+			.showOpenDialog({
+				filters: [{ name: 'MP4 File', extensions: ['mp4'] }],
+				properties: ['openFile'],
+			})
 			.then(result => {
 				e.sender.send('selected-file', result.filePaths[0])
 			})
