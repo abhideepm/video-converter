@@ -26,7 +26,7 @@ ipc.on('open-folder', () => {
 ipc.on('select-output-folder', (_, outputPath) => {
 	if (!fs.readdirSync(outputPath).length) {
 		output = outputPath
-		ipc.send('open-select-file')
+		ipc.send('open-select-file', outputPath)
 	} else ipc.send('invalid-output-folder')
 })
 

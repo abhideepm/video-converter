@@ -1,12 +1,17 @@
 import React, { useState } from 'react'
 const electron = window.require('electron')
 const ipc = electron.ipcRenderer
+const path = window.require('path')
 
 const Convert = () => {
 	const [processingStatus, setProcessingStatus] = useState(false)
+	const [outputPath, setOutputPath] = useState('')
+	const [inputPath, setInputPath] = useState('')
 
-	ipc.on('toggle-status-true', (_, path) => {
-		setProcessingStatus(true)
+	ipc.on('toggle-status-true', (_, filePath, folderPath) => {
+		// setProcessingStatus(true)
+		setOutputPath(folderPath)
+		setInputPath(path.basename(filePath))
 		// ipc.send('start-processing', path)
 	})
 	ipc.on('toggle-status-false', () => {
@@ -18,18 +23,23 @@ const Convert = () => {
 			<input
 				type="text"
 				className="form-control form-control-lg form-control-plaintext w-50 mx-auto mb-5 rounded-0 bg-light"
-				value="abc"
+				value={outputPath}
 				readOnly
 			/>
 			<h1>Input File Path</h1>
 			<input
 				type="text"
 				className="form-control form-control-lg form-control-plaintext w-50 mx-auto mb-5 rounded-0 bg-light"
-				value="bcd"
+				value={inputPath}
 				readOnly
 			/>
 			<h5>Chose the wrong path? Select Again</h5>
-			<button className="btn btn-info mb-5 mt-2 rounded-0">
+			<button
+				className="btn btn-info mb-5 mt-2 rounded-0"
+				onClick={() => {
+					ipc.send('select-folder')
+				}}
+			>
 				Select Path Again
 			</button>
 			<h5>When ready, click the button below to start the conversion</h5>

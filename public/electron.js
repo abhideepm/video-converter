@@ -79,7 +79,7 @@ ipc.on('select-folder', e => {
 		})
 })
 
-ipc.on('open-select-file', e => {
+ipc.on('open-select-file', (e, folderPath) => {
 	dialog
 		.showOpenDialog({
 			title: 'Select File to Convert',
@@ -89,7 +89,7 @@ ipc.on('open-select-file', e => {
 		})
 		.then(result => {
 			if (!result.canceled)
-				e.sender.send('toggle-status-true', result.filePaths[0])
+				e.sender.send('toggle-status-true', result.filePaths[0], folderPath)
 			else {
 				dialog.showErrorBox('File not Selected', 'Please select a file')
 			}
