@@ -1,17 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 const electron = window.require('electron')
 const ipc = electron.ipcRenderer
 
-const Main = () => {
-	const [processingStatus, setProcessingStatus] = useState(false)
-
-	ipc.on('toggle-status-true', (_, path) => {
-		setProcessingStatus(true)
-		ipc.send('start-processing', path)
-	})
-	ipc.on('toggle-status-false', () => {
-		setProcessingStatus(false)
-	})
+const Main = ({ history }) => {
 	return (
 		<div className="text-center d-flex flex-column align-items-center mt-5 mx-5">
 			<h1>Welcome to Video Converter</h1>
@@ -42,22 +33,16 @@ const Main = () => {
 					</ol>
 				</div>
 			</h5>
-			<h3 className="mt-3">Select Folder and File to Continue</h3>
 			<button
 				id="selectFile"
-				className="btn btn-info mt-4"
+				className="btn btn-info mt-4 rounded-0"
 				onClick={() => {
 					ipc.send('select-folder')
+					history.push('/convert')
 				}}
 			>
-				Select
+				Select Folder and File
 			</button>
-			{processingStatus && (
-				<>
-					<div className="spinner-border text-light mt-3"></div>
-					<p>Converting...</p>
-				</>
-			)}
 		</div>
 	)
 }
