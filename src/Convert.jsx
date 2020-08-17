@@ -3,20 +3,21 @@ const electron = window.require('electron')
 const ipc = electron.ipcRenderer
 const path = window.require('path')
 
-const Convert = () => {
+const Convert = ({ history }) => {
 	const [processingStatus, setProcessingStatus] = useState(false)
 	const [outputPath, setOutputPath] = useState('')
 	const [inputPath, setInputPath] = useState('')
+	const [finished, setFinished] = useState(false)
 
 	ipc.on('toggle-status-true', (_, filePath, folderPath) => {
-		// setProcessingStatus(true)
 		setOutputPath(folderPath)
-		setInputPath(path.basename(filePath))
-		// ipc.send('start-processing', path)
+		setInputPath(filePath)
 	})
 	ipc.on('toggle-status-false', () => {
 		setProcessingStatus(false)
+		setFinished(true)
 	})
+
 	return (
 		<div className="text-center mt-5">
 			<h1>Output Directory Path</h1>
@@ -30,7 +31,7 @@ const Convert = () => {
 			<input
 				type="text"
 				className="form-control form-control-lg form-control-plaintext w-50 mx-auto mb-5 rounded-0 bg-light"
-				value={inputPath}
+				value={path.basename(inputPath)}
 				readOnly
 			/>
 			<h5>Chose the wrong path? Select Again</h5>
@@ -43,13 +44,22 @@ const Convert = () => {
 				Select Path Again
 			</button>
 			<h5>When ready, click the button below to start the conversion</h5>
-			<button className="btn btn-success mt-2 rounded-0">Convert!</button>
+			<button
+				className="btn btn-success mt-2 rounded-0"
+				onClick={() => {
+					setProcessingStatus(true)
+					ipc.send('start-processing', inputPath)
+				}}
+			>
+				Convert!
+			</button>
 			{processingStatus && (
-				<>
+				<div>
 					<div className="spinner-border text-light mt-3"></div>
 					<p>Converting...</p>
-				</>
+				</div>
 			)}
+			{finished && <p className="text-success">Conversion Finished</p>}
 		</div>
 	)
 }

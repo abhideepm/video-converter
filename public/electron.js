@@ -98,7 +98,7 @@ ipc.on('open-select-file', (e, folderPath) => {
 })
 
 ipc.on('start-processing', (e, path) => {
-	e.sender.send('selected-file', path)
+	e.sender.send('render-file', path)
 })
 
 ipc.on('toggle-status-main', e => {
