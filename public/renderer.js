@@ -3,6 +3,7 @@ const ipc = electron.ipcRenderer
 const ffmpeg = require('fluent-ffmpeg')
 const process = require('child_process')
 const path = require('path')
+const fs = require('fs')
 
 const ffmpegPath = require('ffmpeg-static').replace(
 	'app.asar',
@@ -26,7 +27,8 @@ selectFile.addEventListener('click', () => {
 })
 
 ipc.on('select-output-folder', (_, outputPath) => {
-	output = outputPath
+	if (!fs.readdirSync(outputPath).length) output = outputPath
+	else ipc.send('invalid-output-folder')
 })
 
 ipc.on('selected-file', (_, paths) => {

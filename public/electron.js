@@ -47,6 +47,8 @@ const menu = Menu.buildFromTemplate([
 				click() {
 					dialog
 						.showOpenDialog({
+							title: 'Select Empty Output Folder',
+							buttonLabel: 'Select Folder',
 							properties: [
 								'openDirectory',
 								'promptToCreate',
@@ -90,4 +92,19 @@ ipc.on('open-select-file', e => {
 			})
 			.catch(err => console.log(err))
 	}
+})
+
+ipc.on('invalid-output-folder', e => {
+	dialog
+		.showMessageBox({
+			type: 'error',
+			buttons: ['OK'],
+			title: 'Invalid Output Folder',
+			message:
+				'The selected Output Folder is not empty, please select an Empty Folder',
+		})
+		.then(result => {
+			if (result) e.sender.send('open-select-file')
+		})
+		.catch(err => console.log(err))
 })
