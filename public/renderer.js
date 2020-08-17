@@ -30,8 +30,8 @@ ipc.on('select-output-folder', (_, outputPath) => {
 	} else ipc.send('invalid-output-folder')
 })
 
-ipc.on('render-file', (_, paths) => {
-	const inputPath = paths
+ipc.on('render-file', (_, filePath) => {
+	const inputPath = filePath
 	const outputPath = path.join(output, '/output.m3u8')
 	const options = [
 		'-codec',
@@ -45,18 +45,16 @@ ipc.on('render-file', (_, paths) => {
 		'-f',
 		'hls',
 	]
-	var proc = new ffmpeg()
+	console.log(inputPath)
+	console.log(outputPath)
 
+	const proc = new ffmpeg(inputPath)
 	proc
-		.addInput(inputPath)
-		.on('end', () => {
-			console.log('here')
-			ipc.send('toggle-status-main')
-		})
-		.on('error', error => {
+		.on('error', function (error) {
 			console.log(error)
 		})
 		.outputOptions(options)
 		.output(outputPath)
 		.run()
+	ipc.send('toggle-status-main')
 })

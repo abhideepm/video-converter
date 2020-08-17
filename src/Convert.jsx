@@ -34,6 +34,16 @@ const Convert = ({ history }) => {
 				value={path.basename(inputPath)}
 				readOnly
 			/>
+			<h3>Click the button below to start the conversion</h3>
+			<button
+				className="btn btn-success btn-lg mt-2 mb-5 rounded-0"
+				onClick={() => {
+					setProcessingStatus(true)
+					ipc.send('start-processing', inputPath)
+				}}
+			>
+				Convert!
+			</button>
 			<h5>Chose the wrong path? Select Again</h5>
 			<button
 				className="btn btn-info mb-5 mt-2 rounded-0"
@@ -42,16 +52,6 @@ const Convert = ({ history }) => {
 				}}
 			>
 				Select Path Again
-			</button>
-			<h5>When ready, click the button below to start the conversion</h5>
-			<button
-				className="btn btn-success mt-2 rounded-0"
-				onClick={() => {
-					setProcessingStatus(true)
-					ipc.send('start-processing', inputPath)
-				}}
-			>
-				Convert!
 			</button>
 			{processingStatus && (
 				<div>

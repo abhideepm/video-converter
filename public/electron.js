@@ -97,8 +97,8 @@ ipc.on('open-select-file', (e, folderPath) => {
 		.catch(err => console.log(err))
 })
 
-ipc.on('start-processing', (e, path) => {
-	e.sender.send('render-file', path)
+ipc.on('start-processing', (e, filePath) => {
+	e.sender.send('render-file', filePath)
 })
 
 ipc.on('toggle-status-main', e => {
