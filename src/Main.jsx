@@ -1,6 +1,4 @@
 import React from 'react'
-const electron = window.require('electron')
-const ipc = electron.ipcRenderer
 
 const Main = ({ history }) => {
 	return (
@@ -37,11 +35,10 @@ const Main = ({ history }) => {
 				id="selectFile"
 				className="btn btn-info mt-4 rounded-0"
 				onClick={() => {
-					ipc.send('select-folder')
 					history.push('/convert')
 				}}
 			>
-				Select Folder and File
+				Select Folder and File and Convert
 			</button>
 		</div>
 	)

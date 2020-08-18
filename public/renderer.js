@@ -45,8 +45,6 @@ ipc.on('render-file', (_, filePath) => {
 		'-f',
 		'hls',
 	]
-	console.log(inputPath)
-	console.log(outputPath)
 
 	const proc = new ffmpeg(inputPath)
 	proc

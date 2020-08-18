@@ -12,7 +12,8 @@ const Convert = () => {
 	ipc.on('toggle-status-true', (_, filePath, folderPath) => {
 		setOutputPath(folderPath)
 		setInputPath(filePath.slice(0))
-		// ipc.send('start-processing', inputPath)
+		ipc.send('start-processing', filePath)
+		setProcessingStatus(true)
 	})
 	ipc.on('toggle-status-false', () => {
 		setProcessingStatus(false)
@@ -35,24 +36,16 @@ const Convert = () => {
 				value={path.basename(inputPath)}
 				readOnly
 			/>
-			<h3>Click the button below to start the conversion</h3>
+			<h3 className="my-5">
+				Click the button below to select paths and start converting
+			</h3>
 			<button
-				className="btn btn-success btn-lg mt-2 mb-5 rounded-0"
-				onClick={() => {
-					setProcessingStatus(true)
-					ipc.send('start-processing', inputPath)
-				}}
-			>
-				Convert!
-			</button>
-			<h5>Chose the wrong path? Select Again</h5>
-			<button
-				className="btn btn-info mb-5 mt-2 rounded-0"
+				className="btn btn-success btn-lg mt-2 rounded-0"
 				onClick={() => {
 					ipc.send('select-folder')
 				}}
 			>
-				Select Path Again
+				{!finished ? 'Start' : 'Start Another Conversion'}
 			</button>
 			{processingStatus && (
 				<div>
@@ -60,7 +53,7 @@ const Convert = () => {
 					<p>Converting...</p>
 				</div>
 			)}
-			{finished && <p className="text-success">Conversion Finished</p>}
+			{finished && <p className="text-light mt-3">Conversion Finished</p>}
 		</div>
 	)
 }
